@@ -8,48 +8,31 @@ if (isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Include your database connection (assumes $pdo is configured here)
-require_once 'db.php'; 
-
 $error_message = '';
 
+$defaultUsername = 'admin';
+$defaultPassword = 'admin123';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    if (empty($username) || empty($password)) {
-        $error_message = "Please enter both username and password.";
-    } else {
-        // Fetch the user record by username
-        $sql = "SELECT id, username, password FROM users WHERE username = :username";
-        
-        try {
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([':username' => $username]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (
+        $username === 'admin' &&
+        $password === 'admin123'
+    ) {
 
-            // Verify the user exists AND the password matches the hash
-            if ($user && password_verify($password, $user['password'])) {
-                
-                // Security measure: Regenerate session ID to prevent hijacking
-                session_regenerate_id(true);
-                
-                // Store user details in the secure $_SESSION array
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                
-                // Redirect to the Dashboard
-                header("Location: index.php");
-                exit;
-                
-            } else {
-                // Keep the error generic to prevent username enumeration
-                $error_message = "Invalid username or password.";
-            }
-        } catch (PDOException $e) {
-            $error_message = "Database error: " . $e->getMessage();
-        }
+        session_regenerate_id(true);
+
+        $_SESSION['user_id'] = 1;
+        $_SESSION['username'] = 'admin';
+
+        header('Location: index.php');
+        exit;
     }
+
+    $error_message = 'Invalid username or password.';
 }
 ?>
 <!DOCTYPE html>
