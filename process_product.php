@@ -85,8 +85,44 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
             die("Delete failed: " . $e->getMessage());
         }
     }
-}
 
+
+// ==========================================
+// HANDLE DELETE (Hard Delete via GET)
+// ==========================================
+// Triggered by a link like: <a href="process_product.php?action=hard_delete&id=1">Delete</a>
+    elseif (isset($_GET['action']) && $_GET['action'] === 'hard_delete' && isset($_GET['id'])) {
+        $sql = "DELETE FROM Products WHERE product_id = :product_id";
+        
+        try {
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([':product_id' => $_GET['id']]);
+            
+            header("Location: product_archieve.php?status=hard_deleted");
+            exit;
+        } catch (PDOException $e) {
+            die("Hard delete failed: " . $e->getMessage());
+        }
+    }
+
+// ==========================================
+// Restore Product
+// ==========================================
+// Triggered by a link like: <a href="process_product.php?action=restore&id=1">Restore</a>
+    elseif (isset($_GET['action']) && $_GET['action'] === 'restore' && isset($_GET['id'])) {
+        $sql = "UPDATE Products SET is_active = TRUE WHERE product_id = :product_id";
+        echo $sql; // Debugging line to check the generated SQL query
+        try {
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([':product_id' => $_GET['id']]);
+            
+            header("Location: product_archieve.php?status=restored");
+            exit;
+        } catch (PDOException $e) {
+            die("Restore failed: " . $e->getMessage());
+        }
+    }
+}
 // If accessed directly without valid parameters, send back to dashboard
 header("Location: index.php");
 exit;

@@ -37,7 +37,7 @@ $sql = "
     INNER JOIN Categories c ON p.category_id = c.category_id
     INNER JOIN Suppliers s ON p.supplier_id = s.supplier_id
     LEFT JOIN Inventory_Transactions it ON it.product_id = p.product_id
-    WHERE p.user_id = ?";
+    WHERE p.user_id = ? AND p.is_active = TRUE" ;
 
 $params = [$active_user_id];
 
@@ -102,7 +102,9 @@ try {
                 <button class="btn btn-outline-dark" type="submit">Search</button>
             </div>
         </form>
-
+        <div class="mb-3 d-flex justify-content-end">
+            <a class="btn btn-primary" href="product_archieve.php"><i class="bi  bi-archive me-1"></i> View Archived Products</a>
+        </div>
         <div class="card shadow-sm border-0">
             <div class="card-body p-0">
                 <div class="table-responsive">
