@@ -45,11 +45,13 @@ if ($status === 'inserted') {
 // For INSERT form dropdowns
 // ------------------------------
 $products = [];
-$suppliers = [];
 
 try {
-    $products = $pdo->query("SELECT product_id, sku, product_name FROM Products ORDER BY product_name ASC")->fetchAll();
-    $suppliers = $pdo->query("SELECT supplier_id, company_name FROM Suppliers ORDER BY company_name ASC")->fetchAll();
+    $products = $pdo->query(
+        "SELECT p.product_id, p.sku, p.product_name, s.company_name AS supplier_name FROM Products p  
+        LEFT JOIN Suppliers s
+        ON p.supplier_id = s.supplier_id 
+        ORDER BY p.product_name ASC")->fetchAll();
 } catch (PDOException $e) {
     die('Error loading dropdown data: ' . $e->getMessage());
 }
@@ -117,10 +119,13 @@ try {
 
                     <div class="col-md-6">
                         <label class="form-label">Product</label>
-                        <select class="form-select" name="product_id" required>
+                        <select class="form-select" name="product_id" id="productSelect" required>
                             <option value="">Select a product...</option>
                             <?php foreach ($products as $p): ?>
-                                <option value="<?= htmlspecialchars($p['product_id']) ?>">
+                                <option
+                                    value="<?= htmlspecialchars($p['product_id']) ?>"
+                                    data-supplier="<?= htmlspecialchars($p['supplier_name'] ?? 'No Supplier') ?>"
+                                >
                                     <?= htmlspecialchars($p['product_name']) ?> (<?= htmlspecialchars($p['sku']) ?>)
                                 </option>
                             <?php endforeach; ?>
@@ -129,14 +134,13 @@ try {
 
                     <div class="col-md-6">
                         <label class="form-label">Supplier (for reference)</label>
-                        <select class="form-select" name="supplier_id" disabled>
-                            <option value="">Select a supplier...</option>
-                            <?php foreach ($suppliers as $s): ?>
-                                <option value="<?= htmlspecialchars($s['supplier_id']) ?>">
-                                    <?= htmlspecialchars($s['company_name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <div
+                            id="supplierDisplay"
+                            class="form-control bg-light"
+                            style="min-height:38px;"
+                        >
+                            Select a product...
+                        </div>
                         <div class="form-text">Supplier is derived from the selected product.</div>
                     </div>
 
@@ -228,5 +232,23 @@ try {
     </div>
 
 </body>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const productSelect = document.getElementById('productSelect');
+    const supplierDisplay = document.getElementById('supplierDisplay');
+
+    function updateSupplier() {
+        const selected =
+            productSelect.options[productSelect.selectedIndex];
+
+        supplierDisplay.textContent = selected.dataset.supplier || 'Select a product...';
+    }
+
+    productSelect.addEventListener('change', updateSupplier);
+
+    updateSupplier();
+});
+</script>
 </html>
 
