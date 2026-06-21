@@ -14,6 +14,7 @@
                 <li class="nav-item"><a class="nav-link" href="index.php">Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link" href="supplier.php">Suppliers</a></li>
                 <li class="nav-item"><a class="nav-link" href="products.php">Products</a></li>
+                <li class="nav-item"><a class="nav-link" href="categories.php">Categories</a></li>
                 <li class="nav-item"><a class="nav-link" href="transaction.php">Transactions</a></li>
                 <li class="nav-item ms-lg-3">
                     <a class="btn btn-outline-light btn-sm px-3" href="logout.php">Logout</a>
