@@ -97,7 +97,7 @@ try {
 
                             <div class="row mb-4">
                                 <div class="col-md-6">
-                                    <label for="unit_price" class="form-label">Unit Price ($)</label>
+                                    <label for="unit_price" class="form-label">Unit Price (Rp)</label>
                                     <input type="number" class="form-control" id="unit_price" name="unit_price" required min="0.01" step="0.01" value="<?= htmlspecialchars($product['unit_price']) ?>">
                                 </div>
                                 <div class="col-md-6">

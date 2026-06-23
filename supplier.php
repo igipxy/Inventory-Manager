@@ -30,7 +30,7 @@ if (isset($_GET['search'])) {
     }
 }
 
-$sql .= " ORDER BY company_name ASC";
+$sql .= " ORDER BY supplier_id ASC";
 
 try {
     $stmt = $pdo->prepare($sql);
@@ -97,7 +97,8 @@ if ($status === 'added') {
                                 <th>ID</th>
                                 <th>Company Name</th>
                                 <th>Email</th>
-                                <th>Phone</th>
+                                <th>Phone</t
+                                h>
                                 <th style="width: 180px;">Actions</th>
                             </tr>
                         </thead>
