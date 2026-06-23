@@ -1,0 +1,230 @@
+
+CREATE DATABASE InventoryManager;
+USE InventoryManager;
+
+-- Categories Table
+CREATE TABLE Categories (
+    category_id INT AUTO_INCREMENT,
+    category_name VARCHAR(50) NOT NULL,
+    description TEXT NULL,
+    PRIMARY KEY (category_id),
+    UNIQUE (category_name)
+);
+
+-- Supplier Table
+CREATE TABLE Suppliers (
+    supplier_id INT AUTO_INCREMENT,
+    company_name VARCHAR(100) NOT NULL,
+    contact_email VARCHAR(100) NULL,
+    contact_phone VARCHAR(20) NULL,
+    PRIMARY KEY (supplier_id),
+    UNIQUE (contact_email)
+);
+
+-- Products Table
+CREATE TABLE Products (
+    product_id INT AUTO_INCREMENT,
+    sku VARCHAR(50) NOT NULL,
+    product_name VARCHAR(100) NOT NULL,
+    category_id INT NULL,
+    supplier_id INT NULL,
+    unit_price DECIMAL(10,2) NOT NULL,
+    reorder_level INT DEFAULT 0,
+    PRIMARY KEY (product_id),
+    UNIQUE (sku),
+    CONSTRAINT fk_product_category 
+        FOREIGN KEY (category_id) REFERENCES Categories(category_id) 
+        ON DELETE SET NULL 
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_product_supplier 
+        FOREIGN KEY (supplier_id) REFERENCES Suppliers(supplier_id) 
+        ON DELETE CASCADE  
+        ON UPDATE CASCADE
+);
+
+ALTER TABLE Products
+ADD COLUMN is_active BOOLEAN DEFAULT TRUE AFTER reorder_level;
+
+
+-- Inventory_Transactions Table
+CREATE TABLE Inventory_Transactions (
+    transaction_id INT AUTO_INCREMENT,
+    product_id INT NOT NULL,
+    transaction_type ENUM('IN', 'OUT', 'ADJUST') NOT NULL,
+    quantity INT NOT NULL,
+    transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    notes VARCHAR(255) NULL,
+    PRIMARY KEY (transaction_id),
+    -- If a product is deleted, cascade the deletion to its transaction history
+    CONSTRAINT fk_transaction_product 
+        FOREIGN KEY (product_id) REFERENCES Products(product_id) 
+        ON DELETE CASCADE 
+        ON UPDATE CASCADE
+);
+
+-- Create the Users table
+CREATE TABLE Users (
+    id INT AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE (username),
+    UNIQUE (email)
+);
+
+-- 6. DATA MODIFICATION: DELETE
+SELECT * FROM categories ;
+SELECT * FROM inventory_transactions;
+SELECT * FROM products  ;
+SELECT * FROM suppliers ;
+SELECT * FROM users;
+
+									-- DML : insert
+INSERT INTO Suppliers (company_name, contact_email, contact_phone, address)
+VALUES (:company_name, :contact_email, :contact_phone, :address);
+
+INSERT INTO Products (sku, product_name, category_id, supplier_id, unit_price, reorder_level, is_active)
+VALUES (:sku, :product_name, :category_id, :supplier_id, :unit_price, :reorder_level, TRUE);
+
+INSERT INTO Inventory_Transactions (product_id, transaction_type, quantity, transaction_date, notes)
+VALUES (:product_id, :transaction_type, :quantity, :transaction_date, :notes);
+
+									-- DML : update 
+UPDATE Suppliers
+SET company_name = :company_name,
+    contact_email = :contact_email,
+    contact_phone = :contact_phone,
+    address = :address
+WHERE supplier_id = :supplier_id;
+
+UPDATE Products
+SET sku = :sku,
+   product_name = :product_name,
+   category_id = :category_id,
+   supplier_id = :supplier_id,
+   unit_price = :unit_price,
+   reorder_level = :reorder_level
+WHERE product_id = :product_id;
+
+									-- DML : delete
+DELETE FROM Suppliers WHERE supplier_id = :supplier_id;
+
+									-- DRL : Display data 
+
+-- STAT 1: Total Suppliers
+SELECT COUNT(*) AS total_suppliers FROM Suppliers WHERE user_id = :user_id
+-- STAT 2: Total Active Products
+SELECT COUNT(*) AS total_products FROM Products
+WHERE is_active = 1 AND user_id = :user_id
+-- STAT 3: Total Current Stock (calculated from transactions)
+SELECT COALESCE(SUM(
+   CASE
+       WHEN t.transaction_type = 'IN'  THEN  t.quantity
+       WHEN t.transaction_type = 'OUT' THEN -t.quantity
+       ELSE t.quantity
+   END
+), 0) AS total_stock
+FROM Inventory_Transactions t
+INNER JOIN Products p ON t.product_id = p.product_id
+WHERE p.user_id = :user_id;
+
+SELECT
+   t.transaction_id,
+   t.transaction_type,
+   t.quantity,
+   t.transaction_date,
+   p.product_name,
+   p.sku,
+   s.company_name AS supplier_name
+FROM Inventory_Transactions t
+INNER JOIN Products p ON t.product_id = p.product_id
+INNER JOIN Suppliers s ON p.supplier_id = s.supplier_id
+WHERE p.user_id = :user_id
+ORDER BY t.transaction_date DESC
+LIMIT 5;
+
+SELECT
+   p.product_id, p.sku, p.product_name,
+   p.unit_price, p.reorder_level, p.is_active,
+   c.category_name,
+   s.company_name AS supplier_name,
+   COALESCE(SUM(
+       CASE
+           WHEN t.transaction_type = 'IN'  THEN  t.quantity
+           WHEN t.transaction_type = 'OUT' THEN -t.quantity
+           ELSE t.quantity
+       END
+   ), 0) AS current_stock
+FROM Products p
+LEFT JOIN Categories c ON p.category_id = c.category_id
+LEFT JOIN Suppliers s ON p.supplier_id = s.supplier_id
+LEFT JOIN Inventory_Transactions t ON p.product_id = t.product_id
+WHERE p.user_id = :user_id
+GROUP BY p.product_id
+ORDER BY p.product_name ASC;
+
+SELECT supplier_id, company_name, contact_email, contact_phone, address
+FROM Suppliers
+WHERE user_id = :user_id
+ORDER BY company_name ASC;
+
+SELECT
+   t.transaction_id,
+   t.transaction_type,
+   t.quantity,
+   t.transaction_date,
+   t.notes,
+   p.product_name,
+   p.sku,
+   s.company_name AS supplier_name
+FROM Inventory_Transactions t
+INNER JOIN Products p ON t.product_id = p.product_id
+INNER JOIN Suppliers s ON p.supplier_id = s.supplier_id
+ORDER BY t.transaction_date DESC;
+
+  SELECT
+       p.product_id,
+       p.sku,
+       p.product_name,
+       p.unit_price,
+       p.reorder_level,
+       p.is_active,
+       c.category_name,
+       s.company_name AS supplier_name,
+       COALESCE(SUM(
+           CASE
+               WHEN it.transaction_type = 'IN' THEN it.quantity
+               WHEN it.transaction_type = 'OUT' THEN -it.quantity
+               ELSE it.quantity
+           END
+       ), 0) AS stock_quantity
+   FROM Products p
+   INNER JOIN Categories c ON p.category_id = c.category_id
+   INNER JOIN Suppliers s ON p.supplier_id = s.supplier_id
+   LEFT JOIN Inventory_Transactions it ON it.product_id = p.product_id
+   WHERE p.user_id = ? AND p.is_active = FALSE ;
+
+
+-- Calculates the total number of active products currently managed in the system.
+SELECT COUNT(product_id) AS total_active_products
+FROM Products
+WHERE is_active = TRUE;
+
+-- Retrieves a targeted list of active products, sorted by their price from highest to lowest.
+SELECT product_name, unit_price
+FROM Products
+WHERE is_active = TRUE
+ORDER BY unit_price;
+
+
+
+
+
+
+
+
+
+
+
