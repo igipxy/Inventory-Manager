@@ -61,7 +61,6 @@ if ($status === 'added') {
 </head>
 <body class="bg-light">
 
-<?php /* navbar is rendered via navbar.php */ ?>
 
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -100,39 +99,11 @@ if ($status === 'added') {
                                 <th style="width: 180px;">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-<<<<<<< HEAD
-                            <?php if (!empty($suppliers)): ?>
-                                <?php foreach ($suppliers as $sup): ?>
-                                    <tr>
-                                        <td class="fw-semibold"><?= htmlspecialchars($sup['company_name']) ?></td>
-                                        <td><?= htmlspecialchars($sup['contact_email'] ?? 'N/A') ?></td>
-                                        <td><?= htmlspecialchars($sup['contact_phone'] ?? 'N/A') ?></td>
-                                        <td>
-                                            <div class="d-flex gap-2">
-                                                <a class="btn btn-sm btn-outline-primary" href="supplier_form.php?id=<?= urlencode($sup['supplier_id']) ?>">
-                                                    <i class="bi bi-pencil-square"></i> Edit
-                                                </a>
-                                                <a class="btn btn-sm btn-outline-danger" 
-                                                   href="process_supplier.php?action=delete&id=<?= urlencode($sup['supplier_id']) ?>" 
-                                                   onclick="return confirm('Delete supplier (ID: <?= htmlspecialchars($sup['supplier_id']) ?>)? This action cannot be undone.');">
-                                                    <i class="bi bi-trash"></i> Delete
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td colspan="5" class="text-center py-4 text-muted">No suppliers found.</td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-=======
+                       
+
     <?php if (!empty($suppliers)): ?>
         <?php $no = 1; foreach ($suppliers as $sup): ?>
-            <tr>
-                <td><?= $no++ ?></td>
+                <tr>
                 <td class="fw-semibold"><?= htmlspecialchars($sup['company_name']) ?></td>
                 <td><?= htmlspecialchars($sup['contact_email'] ?? 'N/A') ?></td>
                 <td><?= htmlspecialchars($sup['contact_phone'] ?? 'N/A') ?></td>
@@ -157,7 +128,6 @@ if ($status === 'added') {
     <?php endif; ?>
 </tbody>
 
->>>>>>> 9056e1b889a0821c487c86b9197cf60bd5b12c0e
                     </table>
                 </div>
             </div>

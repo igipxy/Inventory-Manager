@@ -113,7 +113,7 @@ try {
                     <table class="table table-hover table-striped mb-0 align-middle">
                         <thead class="table-dark">
                             <tr>
-                                <th>Product ID</th>
+                               
                                 <th>Product Name</th>
                                 <th>Category</th>
                                 <th>Price</th>
@@ -127,7 +127,7 @@ try {
                             <?php if (!empty($products)): ?>
                                 <?php foreach ($products as $product): ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($product['product_id']) ?></td>
+                                       
                                         <td class="fw-semibold">
                                             <?= htmlspecialchars($product['product_name']) ?><br>
                                             <small class="text-muted">SKU: <?= htmlspecialchars($product['sku']) ?></small>
