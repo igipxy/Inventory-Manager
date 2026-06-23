@@ -2,7 +2,7 @@
 // db.php
 // Database configuration
 $host = 'localhost';
-$dbname = 'InventoryManager';
+$dbname = 'inventorymanager';
 $username = 'root'; // Default username for XAMPP/MAMP
 $password = '';     // Default password is usually empty for local development
 
