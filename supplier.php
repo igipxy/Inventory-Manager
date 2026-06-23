@@ -94,7 +94,6 @@ if ($status === 'added') {
                     <table class="table table-hover table-striped mb-0 align-middle">
                         <thead class="table-dark">
                             <tr>
-                                <th>ID</th>
                                 <th>Company Name</th>
                                 <th>Email</th>
                                 <th>Phone</t
@@ -106,7 +105,6 @@ if ($status === 'added') {
                             <?php if (!empty($suppliers)): ?>
                                 <?php foreach ($suppliers as $sup): ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($sup['supplier_id']) ?></td>
                                         <td class="fw-semibold"><?= htmlspecialchars($sup['company_name']) ?></td>
                                         <td><?= htmlspecialchars($sup['contact_email'] ?? 'N/A') ?></td>
                                         <td><?= htmlspecialchars($sup['contact_phone'] ?? 'N/A') ?></td>

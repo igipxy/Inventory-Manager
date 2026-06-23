@@ -47,7 +47,7 @@ $status = $_GET['status'] ?? '';
             <table class="table table-striped">
                 <thead class="table-dark">
                     <tr>
-                        <th>ID</th>
+                        
                         <th>Category Name</th>
                         <th>Description</th>
                         <th width="180">Actions</th>
@@ -60,7 +60,6 @@ $status = $_GET['status'] ?? '';
 
                     <tr>
 
-                        <td><?= $cat['category_id'] ?></td>
 
                         <td><?= htmlspecialchars($cat['category_name']) ?></td>
 
